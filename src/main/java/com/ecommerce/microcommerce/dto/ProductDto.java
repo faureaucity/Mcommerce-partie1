@@ -1,5 +1,4 @@
-package com.ecommerce.microcommerce.model;
-
+package com.ecommerce.microcommerce.dto;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import org.hibernate.validator.constraints.Length;
 
@@ -8,9 +7,21 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.Min;
 
-@Entity
-@JsonFilter("monFiltreDynamique")
-public class Product {
+
+
+/*
+  On utilise des objets transverses à la place des entités/dao
+  dans le métier et le front-end
+
+  Dto copie de l'entité Product.java
+
+  On ajoute un attribut marge en plus par rapport à l'entité originale 
+
+*/
+
+
+@JsonFilter("monFiltreDynamiqueDto")
+public class ProductDto {
 
     @Id
     @GeneratedValue
@@ -24,17 +35,24 @@ public class Product {
 
     //information que nous ne souhaitons pas exposer
     private int prixAchat;
+    
+    private int marge ;
 
     //constructeur par défaut
-    public Product() {
+    public ProductDto() {
     }
 
-    //constructeur pour nos tests
-    public Product(int id, String nom, int prix, int prixAchat) {
+    public ProductDto(int id, String nom, int prix, int prixAchat) {
         this.id = id;
         this.nom = nom;
         this.prix = prix;
         this.prixAchat = prixAchat;
+        //this.marge = prix - prixAchat;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductDto{" + "id=" + id + ", nom=" + nom + ", prix=" + prix + ", prixAchat=" + prixAchat + ", marge=" + marge + '}';
     }
 
     public int getId() {
@@ -69,12 +87,14 @@ public class Product {
         this.prixAchat = prixAchat;
     }
 
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", nom='" + nom + '\'' +
-                ", prix=" + prix +
-                '}';
+    public int getMarge() {
+        return this.getPrix()-this.getPrixAchat();
     }
+
+
+
+
+ 
+
+
 }
