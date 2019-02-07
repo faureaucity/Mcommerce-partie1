@@ -35,12 +35,15 @@ public class ProductController {
     public MappingJacksonValue listeProduits() {
 
         Iterable<Product> produits = productDao.findAll();
+        //on mappe notre entité en dto
+        //on ne renvoie jamais une entité au front-end !!!!!!!
+        ModelMapper modelMapper = new ModelMapper();
+        List<ProductDto> produitsDto = modelMapper.map(produits, new TypeToken<List<ProductDto>>() {
+        }.getType());
 
-        SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("prixAchat");
-
-        FilterProvider listDeNosFiltres = new SimpleFilterProvider().addFilter("monFiltreDynamique", monFiltre);
-
-        MappingJacksonValue produitsFiltres = new MappingJacksonValue(produits);
+        SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("prixAchat", "marge");
+        FilterProvider listDeNosFiltres = new SimpleFilterProvider().addFilter("monFiltreDynamiqueDto", monFiltre);
+        MappingJacksonValue produitsFiltres = new MappingJacksonValue(produitsDto);
 
         produitsFiltres.setFilters(listDeNosFiltres);
 
@@ -51,21 +54,41 @@ public class ProductController {
     @ApiOperation(value = "Récupère un produit grâce à son ID à condition que celui-ci soit en stock!")
     @GetMapping(value = "/Produits/{id}")
 
-    public Product afficherUnProduit(@PathVariable int id) {
+    public MappingJacksonValue afficherUnProduit(@PathVariable int id) {
 
         Product produit = productDao.findById(id);
+        //on mappe notre entité en dto
+        //on ne renvoie jamais une entité au front-end !!!!!!!
+        ModelMapper modelMapper = new ModelMapper();
+        ProductDto produitDto = modelMapper.map(produit, new TypeToken<ProductDto>() {
+        }.getType());
 
-        if (produit == null) {
+        if (produitDto == null) {
             throw new ProduitIntrouvableException("Le produit avec l'id " + id + " est INTROUVABLE. Écran Bleu si je pouvais.");
         }
 
-        return produit;
+        
+        
+        //on crée un filtre, on ne remonte pas la marge et le prix d'achat
+        SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("prixAchat","marge");
+        FilterProvider listDeNosFiltres = new SimpleFilterProvider().addFilter("monFiltreDynamiqueDto", monFiltre);
+        MappingJacksonValue produitsFiltres = new MappingJacksonValue(produitDto);
+
+        produitsFiltres.setFilters(listDeNosFiltres);
+        
+        
+        return produitsFiltres;
     }
 
     //ajouter un produit
     @PostMapping(value = "/Produits")
 
-    public ResponseEntity<Void> ajouterProduit(@Valid @RequestBody Product product) {
+    public ResponseEntity<Void> ajouterProduit(@Valid @RequestBody ProductDto productDto) {
+
+        //on mappe la dto en entité
+        ModelMapper modelMapper = new ModelMapper();
+        Product product = modelMapper.map(productDto, new TypeToken<Product>() {
+        }.getType());
 
         Product productAdded = productDao.save(product);
 
@@ -81,25 +104,22 @@ public class ProductController {
 
         return ResponseEntity.created(location).build();
     }
-    
-    
+
     @GetMapping(value = "/AdminProduits")
     //grâce à la regex de la classe SwaggerConfig.java, la doc ne contient
     //pas cette méthode
     public MappingJacksonValue calculerMargeProduit() {
 
-        //on récupère l'ensemble des produits
+        //on récupère l'ensemble des produits depuis la bdd
         List<Product> produits = productDao.findAll();
         //on mappe notre entité en dto
-          //on ne renvoie jamais une entité au front-end !!!!!!!
+        //on ne renvoie jamais une entité au front-end !!!!!!!
         ModelMapper modelMapper = new ModelMapper();
         List<ProductDto> produitsDto = modelMapper.map(produits, new TypeToken<List<ProductDto>>() {
         }.getType());
 
         //le calcul de la marge etant trivial, il est mis directement
         //dans le getter du dto
-
-
         //on crée un filtre pour ne pas remonter le prix d'achat
         SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("prixAchat");
         FilterProvider listDeNosFiltres = new SimpleFilterProvider().addFilter("monFiltreDynamiqueDto", monFiltre);
@@ -114,6 +134,32 @@ public class ProductController {
     public void supprimerProduit(@PathVariable int id) {
 
         productDao.delete(id);
+    }
+
+    @GetMapping(value = "/AdminProduitsTrierParNom")
+    //grâce à la regex de la classe SwaggerConfig.java, la doc ne contient
+    //pas cette méthode
+    public MappingJacksonValue trierProduitsParOrdreAlphabetique() {
+
+        //on récupère l'ensemble des produits ordonnés par leur nom
+        //depuis la bdd
+        List<Product> produits = productDao.findAllByOrderByNom();
+        //on mappe notre entité en dto
+        //on ne renvoie jamais une entité au front-end !!!!!!!
+        ModelMapper modelMapper = new ModelMapper();
+        List<ProductDto> produitsDto = modelMapper.map(produits, new TypeToken<List<ProductDto>>() {
+        }.getType());
+
+        //le calcul de la marge etant trivial, il est mis directement
+        //dans le getter du dto
+        //on crée un filtre pour ne pas remonter la marge
+        SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("marge");
+        FilterProvider listDeNosFiltres = new SimpleFilterProvider().addFilter("monFiltreDynamiqueDto", monFiltre);
+        MappingJacksonValue produitsFiltres = new MappingJacksonValue(produitsDto);
+
+        produitsFiltres.setFilters(listDeNosFiltres);
+
+        return produitsFiltres;
     }
 
     @PutMapping(value = "/Produits")
