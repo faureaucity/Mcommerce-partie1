@@ -1,0 +1,243 @@
+{
+	"info": {
+		"_postman_id": "ff7abf5a-9eb3-44c7-82c9-42ce7c5e4ecc",
+		"name": "openClassRhum",
+		"description": "Ensemble des tests pour la première partie du cours sur les micro-services spring.\n   Deux séries de tests :\n   \n   1ère série ==> méthode http GET : renvoie l'ensemble des produits avec leurs marges\n   2ème série ==> méthode http POST : renvoie une erreur si le produits n'est pas complet (manque le prix ;)\n   ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Afficher tous produits",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:9090//Produits",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"",
+						"Produits"
+					]
+				},
+				"description": "Affiche l'ensemble des produits (sans le prix d'achat)"
+			},
+			"response": []
+		},
+		{
+			"name": "Afficher un produit",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:9090//Produits/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"",
+						"Produits",
+						"2"
+					]
+				},
+				"description": "Permet grâce à l'identifiant d'afficher le produit correspondant"
+			},
+			"response": []
+		},
+		{
+			"name": "Produits triés",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:9090/AdminProduitsTrierParNom",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"AdminProduitsTrierParNom"
+					]
+				},
+				"description": "Trier les produits pas ordre Alphanumérique"
+			},
+			"response": []
+		},
+		{
+			"name": "Afficher marge des produits",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:9090/AdminProduits",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"AdminProduits"
+					]
+				},
+				"description": "requete GET pour tester le renvoie de l'ensemble des produits avec leurs marges"
+			},
+			"response": []
+		},
+		{
+			"name": "Ajouter produit retour erreur 422",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": 4,\n  \"nom\": \"Poney en bois\",\n  \"prix\": 0,\n  \"prixAchat\":100\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9090/Produits",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"Produits"
+					]
+				},
+				"description": "On essaye d'ajouter un produit avec un prix null !!!\n   retour erreur maison"
+			},
+			"response": []
+		},
+		{
+			"name": "Ajouter produit retour 201 ok",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": 4,\n  \"nom\": \"Poney en bois\",\n  \"prix\": 600,\n  \"prixAchat\":100\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9090/Produits",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"Produits"
+					]
+				},
+				"description": "On essaye d'ajouter un produit avec un prix null !!!\n   retour erreur maison"
+			},
+			"response": []
+		},
+		{
+			"name": "Doc",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:9090/v2/api-docs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"v2",
+						"api-docs"
+					]
+				},
+				"description": "affiche la doc au format json"
+			},
+			"response": []
+		},
+		{
+			"name": "Doc swagger",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:9090/swagger-ui.html#/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"swagger-ui.html"
+					],
+					"hash": "/"
+				},
+				"description": "doc avec l'api swagger"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d025a57d-0679-48b0-93fb-db650163e0a9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "e6c9bed7-269b-48dc-9b2d-4a33c6fdc338",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -8,6 +8,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ *
+ * @author openClassRhum
+ */
+
 @Repository
 public interface ProductDao extends JpaRepository<Product, Integer> {
 

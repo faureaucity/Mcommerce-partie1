@@ -8,6 +8,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.Min;
 
+
+/**
+ *
+ * @author openClassRhum
+ */
 @Entity
 @JsonFilter("monFiltreDynamique")
 public class Product {

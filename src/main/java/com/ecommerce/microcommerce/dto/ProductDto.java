@@ -1,36 +1,33 @@
 package com.ecommerce.microcommerce.dto;
+
 import com.fasterxml.jackson.annotation.JsonFilter;
 import org.hibernate.validator.constraints.Length;
-
-
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.validation.constraints.Min;
 
+/**
+ *
+ * @author openClassRhum
+ */
 
 
 /*
   On utilise des objets transverses à la place des entités/dao
   dans le métier et le front-end
-
   Dto copie de l'entité Product.java
-
-  On ajoute un attribut marge en plus par rapport à l'entité originale 
-
+  On ajoute un attribut marge en plus par rapport à l'entité originale
 */
-
-
 @JsonFilter("monFiltreDynamiqueDto")
 public class ProductDto {
 
     @Id
     private int id;
 
+    @Length(min=3, max=20, message = "Nom trop long ou trop court. Et oui messages sont plus stylés que ceux de Spring")
     private String nom;
-
+    
     private int prix;
 
-    //information que nous ne souhaitons pas exposer
+    
     private int prixAchat;
     
     private int marge ;

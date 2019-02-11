@@ -3,6 +3,7 @@ package com.ecommerce.microcommerce.web.controller;
 import com.ecommerce.microcommerce.dao.ProductDao;
 import com.ecommerce.microcommerce.dto.ProductDto;
 import com.ecommerce.microcommerce.model.Product;
+import com.ecommerce.microcommerce.web.exceptions.ProduitGratuitException;
 import com.ecommerce.microcommerce.web.exceptions.ProduitIntrouvableException;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -21,8 +22,13 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
-@Api(description = "API pour les opérations CRUD sur les produits.")
+/**
+ *
+ * @author openClassRhum
+ */
 
+
+@Api(description = "API pour les opérations CRUD sur les produits.")
 @RestController
 public class ProductController {
 
@@ -41,6 +47,7 @@ public class ProductController {
         List<ProductDto> produitsDto = modelMapper.map(produits, new TypeToken<List<ProductDto>>() {
         }.getType());
 
+        //mise en place d'un filtre
         SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("prixAchat", "marge");
         FilterProvider listDeNosFiltres = new SimpleFilterProvider().addFilter("monFiltreDynamiqueDto", monFiltre);
         MappingJacksonValue produitsFiltres = new MappingJacksonValue(produitsDto);
@@ -50,10 +57,11 @@ public class ProductController {
         return produitsFiltres;
     }
 
-    //Récupérer un produit par son Id
+    
+    
+    
     @ApiOperation(value = "Récupère un produit grâce à son ID à condition que celui-ci soit en stock!")
     @GetMapping(value = "/Produits/{id}")
-
     public MappingJacksonValue afficherUnProduit(@PathVariable int id) {
 
         Product produit = productDao.findById(id);
@@ -67,23 +75,31 @@ public class ProductController {
             throw new ProduitIntrouvableException("Le produit avec l'id " + id + " est INTROUVABLE. Écran Bleu si je pouvais.");
         }
 
-        
-        
         //on crée un filtre, on ne remonte pas la marge et le prix d'achat
-        SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("prixAchat","marge");
+        SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("prixAchat", "marge");
         FilterProvider listDeNosFiltres = new SimpleFilterProvider().addFilter("monFiltreDynamiqueDto", monFiltre);
         MappingJacksonValue produitsFiltres = new MappingJacksonValue(produitDto);
 
         produitsFiltres.setFilters(listDeNosFiltres);
-        
-        
+
         return produitsFiltres;
     }
 
-    //ajouter un produit
+    
+    
+    /*ajouter un produit
+        Aucune vérification n'est faite afin de savoir si l'objet est déjà présent
+        en bdd
+        TODO dans un prochain cours ;)
+    */
     @PostMapping(value = "/Produits")
-
     public ResponseEntity<Void> ajouterProduit(@Valid @RequestBody ProductDto productDto) {
+
+        //on teste si l'utilisateur a transmis un prix
+        if (productDto.getPrix() == 0) {
+            //on renvoie le code 422 ==> entité incomplète
+            throw new ProduitGratuitException("Produit incomplet==> le prix est manquant :) ");
+        }
 
         //on mappe la dto en entité
         ModelMapper modelMapper = new ModelMapper();
@@ -96,6 +112,7 @@ public class ProductController {
             return ResponseEntity.noContent().build();
         }
 
+        //retour 201 si le produit est ajouté à la bdd 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -105,9 +122,10 @@ public class ProductController {
         return ResponseEntity.created(location).build();
     }
 
-    @GetMapping(value = "/AdminProduits")
+
     //grâce à la regex de la classe SwaggerConfig.java, la doc ne contient
     //pas cette méthode
+    @GetMapping(value = "/AdminProduits")
     public MappingJacksonValue calculerMargeProduit() {
 
         //on récupère l'ensemble des produits depuis la bdd
@@ -136,9 +154,10 @@ public class ProductController {
         productDao.delete(id);
     }
 
-    @GetMapping(value = "/AdminProduitsTrierParNom")
+    
     //grâce à la regex de la classe SwaggerConfig.java, la doc ne contient
-    //pas cette méthode
+    //pas cette méthode    
+    @GetMapping(value = "/AdminProduitsTrierParNom")
     public MappingJacksonValue trierProduitsParOrdreAlphabetique() {
 
         //on récupère l'ensemble des produits ordonnés par leur nom
